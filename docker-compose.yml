@@ -1,0 +1,51 @@
+version: '3'
+services:
+  web:
+    image: nginx:alpine
+    ports:
+      - "7080:7080"
+      - "7081:7081"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/nginx.conf
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - /var/www:/usr/share/nginx/html
+    depends_on:
+      - php-fpm-me
+    networks:
+      - lnmp-me
+  php-fpm-me:
+    build: 
+      context: ./php
+      dockerfile: Dockerfile
+    volumes:
+      - /var/www:/usr/share/nginx/html
+    networks:
+      - lnmp-me
+  
+  mysql:
+    image: mysql:8.2
+    volumes:
+      - ./mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: root
+      MYSQL_USER: dockeruser
+      MYSQL_PASSWORD: 123456
+    restart: always
+    command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - "33065:3306"
+    networks:
+      - lnmp-me
+  
+  redis:
+    image: redis:alpine
+    ports:
+      - "63790:6379"
+    restart: always
+    networks:
+      - lnmp-me
+
+networks:
+  lnmp-me:
+    driver: bridge
