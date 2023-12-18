@@ -5,17 +5,27 @@ services:
     ports:
       - "7080:7080"
       - "7081:7081"
+      - "7082:7082"
     volumes:
       - ./nginx/default.conf:/etc/nginx/nginx.conf
       - ./nginx/conf.d:/etc/nginx/conf.d
       - /var/www:/usr/share/nginx/html
     depends_on:
       - php-fpm-me
+      - php-fpm-me-2
     networks:
       - lnmp-me
   php-fpm-me:
     build: 
       context: ./php
+      dockerfile: Dockerfile
+    volumes:
+      - /var/www:/usr/share/nginx/html
+    networks:
+      - lnmp-me
+  php-fpm-me-2:
+    build: 
+      context: ./php-5
       dockerfile: Dockerfile
     volumes:
       - /var/www:/usr/share/nginx/html
